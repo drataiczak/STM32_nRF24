@@ -93,11 +93,11 @@
 #define RPD_B 0
 
 // FIFO_STATUS_REG bits
-#define TX_REUSE_B 6
-#define TX_FULL_B  5
-#define TX_EMPTY_B 4
-#define RX_FULL_B  1
-#define RX_EMPTY_B 0
+#define TX_FIFO_REUSE_B 6
+#define TX_FIFO_FULL_B  5
+#define TX_FIFO_EMPTY_B 4
+#define RX_FIFO_FULL_B  1
+#define RX_FIFO_EMPTY_B 0
 
 // DYNPD_REG bits
 #define DPL_P5_B 5
