@@ -27,7 +27,6 @@ uint8_t _RW(nrf24_t *nrf, uint8_t reg) {
 
 uint8_t nRF24_Init(nrf24_t *nrf, SPI_HandleTypeDef *hspi, GPIO_TypeDef *csnPort, uint16_t csnPin, GPIO_TypeDef *cePort, uint16_t cePin) {
     uint8_t status = 0;
-    HAL_StatusTypeDef halStatus = HAL_OK;
 
     nrf->hspi = hspi;
     nrf->csn = csnPort;
@@ -35,7 +34,13 @@ uint8_t nRF24_Init(nrf24_t *nrf, SPI_HandleTypeDef *hspi, GPIO_TypeDef *csnPort,
     nrf->csnPin = csnPin;
     nrf->cePin = cePin;
 
-    nRF24_Test(nrf);
+    status += nRF24_Test(nrf);
+    if(status > 0) {
+        // Bail, trying to configure the transceiver doesnt make sense if we couldnt RW registers
+        return status;
+    }
+
+
 
     return status;
 }
@@ -95,8 +100,137 @@ uint8_t nRF24_Test(nrf24_t *nrf) {
     uint8_t status = 0;
     uint8_t buf[SIZE_TX_ADDR] = {0};
 
-    nRF24_WriteMBReg(nrf, TX_ADDR_REG, (uint8_t *) "nrf24", SIZE_TX_ADDR);
+    // Validate that the transceiver exists and we're able to correctly access registers for RW
+    nRF24_WriteMBReg(nrf, TX_ADDR_REG, (uint8_t *) TEST_TX_ADDR, SIZE_TX_ADDR);
     nRF24_ReadMBReg(nrf, TX_ADDR_REG, buf, SIZE_TX_ADDR);
 
+    for(uint8_t i = 0; i < SIZE_TX_ADDR; i++) {
+        if(buf[i] != TEST_TX_ADDR[i]) {
+            // Found mismatch, bail with error
+            status++;
+            break; 
+        }
+    }
+
     return status;
+}
+
+void nRF24_FlushTx(nrf24_t *nrf) {
+    uint8_t status = 0;
+    
+    nRF24_WriteReg(nrf, CMD_FLUSH_TX, status);
+}
+
+void nRF24_FlushRx(nrf24_t *nrf) {
+    uint8_t status = 0;
+
+    nRF24_WriteReg(nrf, CMD_FLUSH_RX, status);
+}
+
+uint8_t nRF24_GetConfig(nrf24_t *nrf) {
+    
+}
+
+uint8_t nRF24_GetAutoAck() {
+
+}
+
+uint8_t nRF24_GetEnabledRxAddrs() {
+    
+}
+
+uint8_t nRF24_GetAddrWidth() {
+    
+}
+
+uint8_t nRF24_GetAutoRetransmit() {
+    
+}
+
+uint8_t nRF24_GetRFChannel() {
+    
+}
+
+uint8_t nRF24_GetRFConfig() {
+    
+}
+
+uint8_t nRF24_GetStatus(nrf24_t *nrf) {
+    uint8_t status;
+
+    status = nRF24_ReadReg(nrf, CONFIG_REG);
+
+    return status;
+}
+
+uint8_t nRF24_GetTxObserve() {
+    
+}
+
+uint8_t nRF24_GetRPD() {
+    
+}
+
+void nRF24_GetRXAddr_P0(nrf24_t *nrf, uint8_t *buf, size_t size) {
+    
+}
+
+void nRF24_GetRXAddr_P1(nrf24_t *nrf, uint8_t *buf, size_t size) {
+    
+}
+
+void nRF24_GetRXAddr_P2(nrf24_t *nrf, uint8_t *buf, size_t size) {
+    
+}
+
+void nRF24_GetRXAddr_P3(nrf24_t *nrf, uint8_t *buf, size_t size) {
+    
+}
+
+void nRF24_GetRXAddr_P4(nrf24_t *nrf, uint8_t *buf, size_t size) {
+    
+}
+
+void nRF24_GetRXAddr_P5(nrf24_t *nrf, uint8_t *buf, size_t size) {
+    
+}
+
+void nRF24_GetTXAddr(nrf24_t *nrf, uint8_t *buf, size_t size) {
+    
+}
+
+uint8_t nRF24_GetRXWidth_P0(nrf24_t *nrf) {
+    
+}
+
+uint8_t nRF24_GetRXWidth_P1(nrf24_t *nrf) {
+    
+}
+
+uint8_t nRF24_GetRXWidth_P2(nrf24_t *nrf) {
+    
+}
+
+uint8_t nRF24_GetRXWidth_P3(nrf24_t *nrf) {
+    
+}
+
+uint8_t nRF24_GetRXWidth_P4(nrf24_t *nrf) {
+    
+}
+
+uint8_t nRF24_GetRXWidth_P5(nrf24_t *nrf) {
+    
+}
+
+uint8_t nRF24_GetFifoStatus(nrf24_t *nrf) {
+    
+}
+
+uint8_t nRF24_GetDynamicPayloadConfig(nrf24_t *nrf) {
+    
+}
+
+uint8_t nRF24_GetFeatureConfig(nrf24_t *nrf) {
+
 }

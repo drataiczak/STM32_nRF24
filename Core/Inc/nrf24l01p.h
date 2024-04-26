@@ -174,4 +174,37 @@ uint8_t nRF24_Test(nrf24_t *nrf);
 void nRF24_WriteReg(nrf24_t *nrf, uint8_t reg, uint8_t value);
 uint8_t nRF24_ReadReg(nrf24_t *nrf, uint8_t reg);
 
+// Commands
+void nRF24_FlushTx(nrf24_t *nrf);
+void nRF24_FlushRx(nrf24_t *nrf);
+
+// Reg getters
+uint8_t nRF24_GetConfig(nrf24_t *nrf);
+uint8_t nRF24_GetAutoAck();
+uint8_t nRF24_GetEnabledRxAddrs();
+uint8_t nRF24_GetAddrWidth();
+uint8_t nRF24_GetAutoRetransmit();
+uint8_t nRF24_GetRFChannel();
+uint8_t nRF24_GetRFConfig();
+uint8_t nRF24_GetStatus(nrf24_t *nrf);
+uint8_t nRF24_GetTxObserve();
+uint8_t nRF24_GetRPD();
+void nRF24_GetRXAddr_P0(nrf24_t *nrf, uint8_t *buf, size_t size);
+void nRF24_GetRXAddr_P1(nrf24_t *nrf, uint8_t *buf, size_t size);
+void nRF24_GetRXAddr_P2(nrf24_t *nrf, uint8_t *buf, size_t size);
+void nRF24_GetRXAddr_P3(nrf24_t *nrf, uint8_t *buf, size_t size);
+void nRF24_GetRXAddr_P4(nrf24_t *nrf, uint8_t *buf, size_t size);
+void nRF24_GetRXAddr_P5(nrf24_t *nrf, uint8_t *buf, size_t size);
+void nRF24_GetTXAddr(nrf24_t *nrf, uint8_t *buf, size_t size);
+uint8_t nRF24_GetRXWidth_P0(nrf24_t *nrf);
+uint8_t nRF24_GetRXWidth_P0(nrf24_t *nrf);
+uint8_t nRF24_GetRXWidth_P1(nrf24_t *nrf);
+uint8_t nRF24_GetRXWidth_P2(nrf24_t *nrf);
+uint8_t nRF24_GetRXWidth_P3(nrf24_t *nrf);
+uint8_t nRF24_GetRXWidth_P4(nrf24_t *nrf);
+uint8_t nRF24_GetRXWidth_P5(nrf24_t *nrf);
+uint8_t nRF24_GetFifoStatus(nrf24_t *nrf);
+uint8_t nRF24_GetDynamicPayloadConfig(nrf24_t *nrf);
+uint8_t nRF24_GetFeatureConfig(nrf24_t *nrf);
+
 #endif
