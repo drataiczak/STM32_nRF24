@@ -112,8 +112,21 @@
 #define EN_ACK_PAY_B 1
 #define EN_DYN_ACK_B 0
 
+// Reg sizes
+#define SIZE_TX_ADDR 5
+
+// Masks
+#define MASK_RW_REG 0x1F // For R/W commands, set last 5 bits
+
+// Test values
+#define TEST_TX_ADDR "NRF24"
+
 typedef struct nrf24 {
     SPI_HandleTypeDef *hspi;
+    GPIO_TypeDef *csn;
+    GPIO_TypeDef *ce;
+    uint16_t csnPin;
+    uint16_t cePin;
 } nrf24_t;
 
 
@@ -156,7 +169,9 @@ typedef enum rfDataRate {
     kbps250 = 0x02  // 250Kbps
 } rfDataRate_t;
 
-uint8_t nRF24_Init(void);
-uint8_t nRF24_Test(void);
+uint8_t nRF24_Init(nrf24_t *nrf, SPI_HandleTypeDef *hspi, GPIO_TypeDef *csnPort, uint16_t csnPin, GPIO_TypeDef *cePort, uint16_t cePin);
+uint8_t nRF24_Test(nrf24_t *nrf);
+void nRF24_WriteReg(nrf24_t *nrf, uint8_t reg, uint8_t value);
+uint8_t nRF24_ReadReg(nrf24_t *nrf, uint8_t reg);
 
 #endif
