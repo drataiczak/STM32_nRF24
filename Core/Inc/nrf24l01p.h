@@ -116,7 +116,17 @@
 #define SIZE_TX_ADDR 5
 
 // Masks
-#define MASK_RW_REG 0x1F // For R/W commands, set last 5 bits
+#define MASK_CONFIG        0x7F
+#define MASK_AUTOACK       0x3F
+#define MASK_ENABLERX_ADDR 0x3F
+#define MASK_ADDR_WIDTH    0x02
+#define MASK_RF_CH         0x7F
+#define MASK_RF_CONFIG     0xBE
+#define MASK_STATUS        0x7F
+#define MASK_RX_PW_PIPE    0x3F
+#define MASK_DYNPD         0x3F
+#define MASK_FEATURE       0x03
+
 
 // Test values
 #define TEST_TX_ADDR "NRF24"
@@ -169,6 +179,15 @@ typedef enum rfDataRate {
     kbps250 = 0x02  // 250Kbps
 } rfDataRate_t;
 
+typedef enum pipe {
+    p0 = 0,
+    p1 = 1,
+    p2 = 2,
+    p3 = 3,
+    p4 = 4,
+    p5 = 5
+} pipe_t;
+
 uint8_t nRF24_Init(nrf24_t *nrf, SPI_HandleTypeDef *hspi, GPIO_TypeDef *csnPort, uint16_t csnPin, GPIO_TypeDef *cePort, uint16_t cePin);
 uint8_t nRF24_Test(nrf24_t *nrf);
 void nRF24_WriteReg(nrf24_t *nrf, uint8_t reg, uint8_t value);
@@ -189,22 +208,26 @@ uint8_t nRF24_GetRFConfig();
 uint8_t nRF24_GetStatus(nrf24_t *nrf);
 uint8_t nRF24_GetTxObserve();
 uint8_t nRF24_GetRPD();
-void nRF24_GetRXAddr_P0(nrf24_t *nrf, uint8_t *buf, size_t size);
-void nRF24_GetRXAddr_P1(nrf24_t *nrf, uint8_t *buf, size_t size);
-void nRF24_GetRXAddr_P2(nrf24_t *nrf, uint8_t *buf, size_t size);
-void nRF24_GetRXAddr_P3(nrf24_t *nrf, uint8_t *buf, size_t size);
-void nRF24_GetRXAddr_P4(nrf24_t *nrf, uint8_t *buf, size_t size);
-void nRF24_GetRXAddr_P5(nrf24_t *nrf, uint8_t *buf, size_t size);
+void nRF24_GetRXPipeAddr(nrf24_t *nrf, pipe_t pipe, uint8_t *buf, size_t size);
 void nRF24_GetTXAddr(nrf24_t *nrf, uint8_t *buf, size_t size);
-uint8_t nRF24_GetRXWidth_P0(nrf24_t *nrf);
-uint8_t nRF24_GetRXWidth_P0(nrf24_t *nrf);
-uint8_t nRF24_GetRXWidth_P1(nrf24_t *nrf);
-uint8_t nRF24_GetRXWidth_P2(nrf24_t *nrf);
-uint8_t nRF24_GetRXWidth_P3(nrf24_t *nrf);
-uint8_t nRF24_GetRXWidth_P4(nrf24_t *nrf);
-uint8_t nRF24_GetRXWidth_P5(nrf24_t *nrf);
+uint8_t nRF24_GetRXPipeWidth_P0(nrf24_t *nrf, pipe_t pipe);
 uint8_t nRF24_GetFifoStatus(nrf24_t *nrf);
 uint8_t nRF24_GetDynamicPayloadConfig(nrf24_t *nrf);
 uint8_t nRF24_GetFeatureConfig(nrf24_t *nrf);
+
+// Reg setters
+void nRF24_SetConfig(nrf24_t *nrf, uint8_t value);
+void nRF24_SetAutoAck(nrf24_t *nrf, uint8_t value);
+void nRF24_SetEnabledRxAddrs(nrf24_t *nrf, uint8_t value);
+void nRF24_SetAddrWidth(nrf24_t *nrf, uint8_t value);
+void nRF24_SetAutoRetransmit(nrf24_t *nrf, uint8_t value);
+void nRF24_SetRFChannel(nrf24_t *nrf, uint8_t value);
+void nRF24_SetRFConfig(nrf24_t *nrf, uint8_t val);
+void nRF24_SetStatus(nrf24_t *nrf, uint8_t value); // Cant set bottom half
+void nRF24_SetRXPipeAddr(nrf24_t *nrf, pipe_t pipe, uint8_t *buf, size_t size);
+void nRF24_SetTXAddr(nrf24_t *nrf, uint8_t *buf, size_t size);
+void nRF24_SetRXPipeWidth(nrf24_t *nrf, pipe_t pipe, uint8_t value);
+void nRF24_SetDynamicPayloadConfig(nrf24_t *nrf, uint8_t value);
+void nRF24_SetFeatureConfig(nrf24_t *nrf, uint8_t value);
 
 #endif

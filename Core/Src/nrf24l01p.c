@@ -71,9 +71,7 @@ void nRF24_WriteMBReg(nrf24_t *nrf, uint8_t reg, uint8_t *buf, size_t size) {
     _CSN_L(nrf);
 
     _RW(nrf, addr);
-    printf("Called w\r\n");
     for(uint8_t i = 0; i < size; i++) {
-        printf("Called w\r\n");
         _RW(nrf, buf[i]);
     }
 
@@ -87,9 +85,7 @@ void nRF24_ReadMBReg(nrf24_t *nrf, uint8_t reg, uint8_t *buf, size_t size) {
     _CSN_L(nrf);
 
     status = _RW(nrf, addr);
-    printf("Called r\r\n");
 	for(uint8_t i = 0; i < size; i++) {
-        printf("Called r\r\n");
 		buf[i] = _RW(nrf, CMD_NOP);
 	}
 
@@ -171,27 +167,7 @@ uint8_t nRF24_GetRPD() {
     
 }
 
-void nRF24_GetRXAddr_P0(nrf24_t *nrf, uint8_t *buf, size_t size) {
-    
-}
-
-void nRF24_GetRXAddr_P1(nrf24_t *nrf, uint8_t *buf, size_t size) {
-    
-}
-
-void nRF24_GetRXAddr_P2(nrf24_t *nrf, uint8_t *buf, size_t size) {
-    
-}
-
-void nRF24_GetRXAddr_P3(nrf24_t *nrf, uint8_t *buf, size_t size) {
-    
-}
-
-void nRF24_GetRXAddr_P4(nrf24_t *nrf, uint8_t *buf, size_t size) {
-    
-}
-
-void nRF24_GetRXAddr_P5(nrf24_t *nrf, uint8_t *buf, size_t size) {
+void nRF24_GetRXPipeAddr(nrf24_t *nrf, pipe_t pipe, uint8_t *buf, size_t size) {
     
 }
 
@@ -199,27 +175,7 @@ void nRF24_GetTXAddr(nrf24_t *nrf, uint8_t *buf, size_t size) {
     
 }
 
-uint8_t nRF24_GetRXWidth_P0(nrf24_t *nrf) {
-    
-}
-
-uint8_t nRF24_GetRXWidth_P1(nrf24_t *nrf) {
-    
-}
-
-uint8_t nRF24_GetRXWidth_P2(nrf24_t *nrf) {
-    
-}
-
-uint8_t nRF24_GetRXWidth_P3(nrf24_t *nrf) {
-    
-}
-
-uint8_t nRF24_GetRXWidth_P4(nrf24_t *nrf) {
-    
-}
-
-uint8_t nRF24_GetRXWidth_P5(nrf24_t *nrf) {
+uint8_t nRF24_GetRXPipeWidth(nrf24_t *nrf, pipe_t pipe) {
     
 }
 
@@ -232,5 +188,58 @@ uint8_t nRF24_GetDynamicPayloadConfig(nrf24_t *nrf) {
 }
 
 uint8_t nRF24_GetFeatureConfig(nrf24_t *nrf) {
+
+}
+
+void nRF24_SetConfig(nrf24_t *nrf, uint8_t value) {
+    // Only set bottom 7 bits
+}
+
+void nRF24_SetAutoAck(nrf24_t *nrf, uint8_t value) {
+    // Only set bottom 6 bits
+}
+
+void nRF24_SetEnabledRxAddrs(nrf24_t *nrf, uint8_t value) {
+
+}
+
+void nRF24_SetAddrWidth(nrf24_t *nrf, uint8_t value) {
+    // Only set the bottom two bits
+}
+
+void nRF24_SetAutoRetransmit(nrf24_t *nrf, uint8_t value) {
+
+}
+
+void nRF24_SetRFChannel(nrf24_t *nrf, uint8_t value) {
+
+}
+
+void nRF24_SetRFConfig(nrf24_t *nrf, uint8_t value) {
+
+}
+
+// Cant set bottom half
+void nRF24_SetStatus(nrf24_t *nrf, uint8_t value) {
+
+}
+
+void nRF24_SetRXPipeAddr(nrf24_t *nrf, pipe_t pipe, uint8_t *buf, size_t size){
+
+}
+
+void nRF24_SetTXAddr(nrf24_t *nrf, uint8_t *buf, size_t size){
+
+}
+
+void nRF24_SetRXPipeWidth(nrf24_t *nrf, pipe_t pipe, uint8_t value){
+
+}
+
+void nRF24_SetDynamicPayloadConfig(nrf24_t *nrf, uint8_t value){
+
+}
+
+void nRF24_SetFeatureConfig(nrf24_t *nrf, uint8_t value){
 
 }
