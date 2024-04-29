@@ -14,6 +14,7 @@ set(CMAKE_C_EXTENSIONS ON)
 
 # Set Flags
 set(CMAKE_EXE_LINKER_FLAGS "-u _printf_float")
+set(CMAKE_C_FLAGS "-DDUMPREGS")
 
 # Define the build type
 if(NOT CMAKE_BUILD_TYPE)
