@@ -75,121 +75,110 @@ void dumpRegs(nrf24_t *nrf) {
   uint8_t reg;
   
   reg = nRF24_GetConfig(nrf);
-  printf("Config reg value: %08x\r\n", reg);
+  printf("Config reg value: %02x\r\n", reg);
   reg = 0;
 
   reg = nRF24_GetAutoAck(nrf);
-  printf("AutoAck reg value: %08x\r\n", reg);
+  printf("AutoAck reg value: %02x\r\n", reg);
   reg = 0;
 
   reg = nRF24_GetEnabledRxAddrs(nrf);
-  printf("Enabled RX addrs reg value: %08x\r\n", reg);
+  printf("Enabled RX addrs reg value: %02x\r\n", reg);
   reg = 0;
 
   reg = nRF24_GetAddrWidth(nrf);
-  printf("Addr width reg value: %08x\r\n", reg);
+  printf("Addr width reg value: %02x\r\n", reg);
   reg = 0;
 
   reg = nRF24_GetAutoRetransmit(nrf);
-  printf("Auto retransmit reg value: %08x\r\n", reg);
+  printf("Auto retransmit reg value: %02x\r\n", reg);
   reg = 0;
 
   reg = nRF24_GetRFChannel(nrf);
-  printf("RF channel reg value: %08x\r\n", reg);
+  printf("RF channel reg value: %02x\r\n", reg);
   reg = 0;
 
   reg = nRF24_GetRFConfig(nrf);
-  printf("RF config reg value: %08x\r\n", reg);
+  printf("RF config reg value: %02x\r\n", reg);
   reg = 0;
 
   reg = nRF24_GetStatus(nrf);
-  printf("Status reg value: %08x\r\n", reg);
+  printf("Status reg value: %02x\r\n", reg);
   reg = 0;
 
   reg = nRF24_GetTxObserve(nrf);
-  printf("TX observation reg value: %08x\r\n", reg);
+  printf("TX observation reg value: %02x\r\n", reg);
   reg = 0;
 
   reg = nRF24_GetRPD(nrf);
-  printf("RPD reg value: %08x\r\n", reg);
+  printf("RPD reg value: %02x\r\n", reg);
   reg = 0;
 
   nRF24_GetRXPipeAddr(nrf, p0, buf, sizeof(buf));
   for(uint8_t i = 0; i < sizeof(buf); i++) {
-    printf("Rx pipe 0 reg value byte %d: %08x\r\n", buf[i], i);
+    printf("Rx pipe 0 reg value byte %d: %02x\r\n", i, buf[i]);
     buf[i] = 0;
   }
 
   nRF24_GetRXPipeAddr(nrf, p1, buf, sizeof(buf));
   for(uint8_t i = 0; i < sizeof(buf); i++) {
-    printf("Rx pipe 1 reg value byte %d: %08x\r\n", buf[i], i);
+    printf("Rx pipe 1 reg value byte %d: %02x\r\n", i, buf[i]);
     buf[i] = 0;
   }
 
-  nRF24_GetRXPipeAddr(nrf, p2, buf, sizeof(buf));
-  for(uint8_t i = 0; i < sizeof(buf); i++) {
-    printf("Rx pipe 2 reg value byte %d: %08x\r\n", buf[i], i);
-    buf[i] = 0;
-  }
+  nRF24_GetRXPipeAddr(nrf, p2, &reg, 1);
+  printf("Rx pipe 2 value: %02x\r\n", reg);
 
-  nRF24_GetRXPipeAddr(nrf, p3, buf, sizeof(buf));
-  for(uint8_t i = 0; i < sizeof(buf); i++) {
-    printf("Rx pipe 3 reg value byte %d: %08x\r\n", buf[i], i);
-    buf[i] = 0;
-  }
+  nRF24_GetRXPipeAddr(nrf, p3, &reg, 1);
+  printf("Rx pipe 2 value: %02x\r\n", reg);
 
-  nRF24_GetRXPipeAddr(nrf, p4, buf, sizeof(buf));
-  for(uint8_t i = 0; i < sizeof(buf); i++) {
-    printf("Rx pipe 4 reg value byte %d: %08x\r\n", buf[i], i);
-    buf[i] = 0;
-  }
+  nRF24_GetRXPipeAddr(nrf, p4, &reg, 1);
+  printf("Rx pipe 2 value: %02x\r\n", reg);
 
-  nRF24_GetRXPipeAddr(nrf, p5, buf, sizeof(buf));
-  for(uint8_t i = 0; i < sizeof(buf); i++) {
-    printf("Rx pipe 5 reg value byte %d: %08x\r\n", buf[i], i);
-    buf[i] = 0;
-  }
+  nRF24_GetRXPipeAddr(nrf, p5, &reg, 1);
+  printf("Rx pipe 2 value: %02x\r\n", reg);
 
   nRF24_GetTXAddr(nrf, buf, sizeof(buf));
   for(uint8_t i = 0; i < sizeof(buf); i++) {
-    printf("Tx addr byte %d: %08x\r\n", buf[i], i);
+    printf("Tx addr byte %d: %02x\r\n", i, buf[i]);
     buf[i] = 0;
   }
 
   reg = nRF24_GetRXPipeWidth(nrf, p0);
-  printf("Rx pipe 0 width reg value: %08x\r\n", reg);
+  printf("Rx pipe 0 width reg value: %02x\r\n", reg);
   reg = 0;
 
   reg = nRF24_GetRXPipeWidth(nrf, p1);
-  printf("Rx pipe 1 width reg value: %08x\r\n", reg);
+  printf("Rx pipe 1 width reg value: %02x\r\n", reg);
   reg = 0;
 
   reg = nRF24_GetRXPipeWidth(nrf, p2);
-  printf("Rx pipe 2 width reg value: %08x\r\n", reg);
+  printf("Rx pipe 2 width reg value: %02x\r\n", reg);
   reg = 0;
 
   reg = nRF24_GetRXPipeWidth(nrf, p3);
-  printf("Rx pipe 3 width reg value: %08x\r\n", reg);
+  printf("Rx pipe 3 width reg value: %02x\r\n", reg);
   reg = 0;
 
   reg = nRF24_GetRXPipeWidth(nrf, p4);
-  printf("Rx pipe 4 width reg value: %08x\r\n", reg);
+  printf("Rx pipe 4 width reg value: %02x\r\n", reg);
   reg = 0;
 
   reg = nRF24_GetRXPipeWidth(nrf, p5);
-  printf("Rx pipe 5 width reg value: %08x\r\n", reg);
+  printf("Rx pipe 5 width reg value: %02x\r\n", reg);
   reg = 0;
 
+  nRF24_ClearFifoStatus(nrf);
   reg = nRF24_GetFifoStatus(nrf);
-  printf("Fifo status reg value: %08x\r\n", reg);
+  printf("Fifo status reg value: %02x\r\n", reg);
   reg = 0;
 
   reg = nRF24_GetDynamicPayloadConfig(nrf);
-  printf("Dynamic payload config reg value: %08x\r\n", reg);
+  printf("Dynamic payload config reg value: %02x\r\n", reg);
   reg = 0;
 
   reg = nRF24_GetFeatureConfig(nrf);
-  printf("Feature config reg value: %08x\r\n", reg);
+  printf("Feature config reg value: %02x\r\n", reg);
 }
 /* USER CODE END 0 */
 
@@ -227,12 +216,13 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
   nrf24_t nrf;
-  nRF24_Init(&nrf, &hspi1, CSN_GPIO_Port, CSN_Pin, CE_GPIO_Port, CE_Pin);
+  uint8_t status = 0;
+  status = nRF24_Init(&nrf, &hspi1, CSN_GPIO_Port, CSN_Pin, CE_GPIO_Port, CE_Pin);
 
   #ifdef DUMPREGS
     dumpRegs(&nrf);
   #endif
-
+  
   /* USER CODE END 2 */
 
   /* Infinite loop */

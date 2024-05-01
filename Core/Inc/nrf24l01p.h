@@ -114,19 +114,46 @@
 
 // Reg sizes
 #define SIZE_TX_ADDR 5
+#define SIZE_RX_P0_ADDR 5
+#define SIZE_RX_P1_ADDR 5
 
 // Masks
 #define MASK_CONFIG        0x7F
 #define MASK_AUTOACK       0x3F
 #define MASK_ENABLERX_ADDR 0x3F
-#define MASK_ADDR_WIDTH    0x02
+#define MASK_ADDR_WIDTH    0x03
 #define MASK_RF_CH         0x7F
 #define MASK_RF_CONFIG     0xBE
 #define MASK_STATUS        0x7F
 #define MASK_RX_PW_PIPE    0x3F
+#define MASK_FIFO_STATUS   0xF3
 #define MASK_DYNPD         0x3F
 #define MASK_FEATURE       0x03
 
+// Default reg values
+#define DEF_CONFIG 0x08
+#define DEF_AUTOACK 0x3F
+#define DEF_ENABLED_RX_ADDRS 0x03
+#define DEF_ADDR_WIDTH 0x03
+#define DEF_AUTO_RETR 0x03
+#define DEF_RF_CHANNEL 0x02
+#define DEF_RF_CONFIG 0x0E
+#define DEF_STATUS 0x00
+#define DEF_RX_P0_ADDR 0xE7E7E7E7E7
+#define DEF_RX_P1_ADDR 0XC2C2C2C2C2
+#define DEF_RX_P2_ADDR 0xC3
+#define DEF_RX_P3_ADDR 0xC4
+#define DEF_RX_P4_ADDR 0xC5
+#define DEF_RX_P5_ADDR 0xC6
+#define DEF_TX_ADDR 0xE7E7E7E7E7
+#define DEF_PW_P0 0x00
+#define DEF_PW_P1 0x00
+#define DEF_PW_P2 0x00
+#define DEF_PW_P3 0x00
+#define DEF_PW_P4 0x00
+#define DEF_PW_P5 0x00
+#define DEF_PD 0x00
+#define DEF_FEATURE 0x00
 
 // Test values
 #define TEST_TX_ADDR "NRF24"
@@ -188,6 +215,12 @@ typedef enum pipe {
     p5 = 5
 } pipe_t;
 
+typedef enum mode {
+    mode_tx = 0x2,
+    mode_rx = 0x3,
+    mode_powerdown = 0x0
+} mode_t;
+
 uint8_t nRF24_Init(nrf24_t *nrf, SPI_HandleTypeDef *hspi, GPIO_TypeDef *csnPort, uint16_t csnPin, GPIO_TypeDef *cePort, uint16_t cePin);
 uint8_t nRF24_Test(nrf24_t *nrf);
 void nRF24_WriteReg(nrf24_t *nrf, uint8_t reg, uint8_t value);
@@ -229,5 +262,9 @@ void nRF24_SetTXAddr(nrf24_t *nrf, uint8_t *buf, size_t size);
 void nRF24_SetRXPipeWidth(nrf24_t *nrf, pipe_t pipe, uint8_t value);
 void nRF24_SetDynamicPayloadConfig(nrf24_t *nrf, uint8_t value);
 void nRF24_SetFeatureConfig(nrf24_t *nrf, uint8_t value);
+void nRF24_ClearFifoStatus(nrf24_t *nrf);
+
+// General
+void nRF24_SetOperationalMode(nrf24_t *nrf, mode_t mode);
 
 #endif

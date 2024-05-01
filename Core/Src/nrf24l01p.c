@@ -26,6 +26,8 @@ uint8_t _RW(nrf24_t *nrf, uint8_t reg) {
 
 uint8_t nRF24_Init(nrf24_t *nrf, SPI_HandleTypeDef *hspi, GPIO_TypeDef *csnPort, uint16_t csnPin, GPIO_TypeDef *cePort, uint16_t cePin) {
     uint8_t status = 0;
+    uint8_t buf[5] = {0};
+    uint8_t value = 0;
 
     nrf->hspi = hspi;
     nrf->csn = csnPort;
@@ -39,8 +41,56 @@ uint8_t nRF24_Init(nrf24_t *nrf, SPI_HandleTypeDef *hspi, GPIO_TypeDef *csnPort,
         return status;
     }
 
+    // Set default values
+    nRF24_SetConfig(nrf, DEF_CONFIG);
+    nRF24_SetAutoAck(nrf, DEF_AUTOACK);
+    nRF24_SetEnabledRxAddrs(nrf, DEF_ENABLED_RX_ADDRS);
+    nRF24_SetAddrWidth(nrf, DEF_ADDR_WIDTH);
+    nRF24_SetAutoRetransmit(nrf, DEF_AUTO_RETR);
+    nRF24_SetRFChannel(nrf, DEF_RF_CHANNEL);
+    nRF24_SetRFConfig(nrf, DEF_RF_CONFIG); // Last bit is "don't care"
+    nRF24_SetStatus(nrf, DEF_STATUS);
 
+    // TODO: Figure out better way to do this
+    for(uint8_t i = 0; i < sizeof(buf); i++) {
+        buf[i] = 0xE7;
+    }
+    nRF24_SetRXPipeAddr(nrf, p0, buf, SIZE_RX_P0_ADDR);
 
+    for(uint8_t i = 0; i < sizeof(buf); i++) {
+        buf[i] = 0xC2;
+    }
+    nRF24_SetRXPipeAddr(nrf, p1, buf, SIZE_RX_P1_ADDR);
+
+    value = DEF_RX_P2_ADDR;
+    nRF24_SetRXPipeAddr(nrf, p2, &value, 1);
+
+    value = DEF_RX_P3_ADDR;
+    nRF24_SetRXPipeAddr(nrf, p3, &value, 1);
+
+    value = DEF_RX_P4_ADDR;
+    nRF24_SetRXPipeAddr(nrf, p4, &value, 1);
+
+    value = DEF_RX_P5_ADDR;
+    nRF24_SetRXPipeAddr(nrf, p5, &value, 1);
+
+    for(uint8_t i = 0; i < sizeof(buf); i++) {
+        buf[i] = 0xE7;
+    }
+    nRF24_SetTXAddr(nrf, buf, sizeof(buf));
+    
+    nRF24_SetRXPipeWidth(nrf, p0, DEF_PW_P0);
+    nRF24_SetRXPipeWidth(nrf, p1, DEF_PW_P1);
+    nRF24_SetRXPipeWidth(nrf, p2, DEF_PW_P2);
+    nRF24_SetRXPipeWidth(nrf, p3, DEF_PW_P3);
+    nRF24_SetRXPipeWidth(nrf, p4, DEF_PW_P4);
+    nRF24_SetRXPipeWidth(nrf, p5, DEF_PW_P5);
+    nRF24_SetDynamicPayloadConfig(nrf, DEF_PD);
+    nRF24_SetFeatureConfig(nrf, DEF_FEATURE);
+
+    nRF24_FlushRx(nrf);
+    nRF24_FlushTx(nrf);
+    
     return status;
 }
 
@@ -59,6 +109,7 @@ uint8_t nRF24_ReadReg(nrf24_t *nrf, uint8_t reg) {
 
     _CSN_L(nrf);
     value = _RW(nrf, addr);
+    value = _RW(nrf, CMD_NOP);
     _CSN_H(nrf);
 
     return value;
@@ -79,11 +130,10 @@ void nRF24_WriteMBReg(nrf24_t *nrf, uint8_t reg, uint8_t *buf, size_t size) {
 
 void nRF24_ReadMBReg(nrf24_t *nrf, uint8_t reg, uint8_t *buf, size_t size) {
     uint8_t addr = reg | CMD_R_REGISTER;
-    uint8_t status;
 
     _CSN_L(nrf);
 
-    status = _RW(nrf, addr);
+    _RW(nrf, addr);
 	for(uint8_t i = 0; i < size; i++) {
 		buf[i] = _RW(nrf, CMD_NOP);
 	}
@@ -96,8 +146,8 @@ uint8_t nRF24_Test(nrf24_t *nrf) {
     uint8_t buf[SIZE_TX_ADDR] = {0};
 
     // Validate that the transceiver exists and we're able to correctly access registers for RW
-    nRF24_WriteMBReg(nrf, TX_ADDR_REG, (uint8_t *) TEST_TX_ADDR, SIZE_TX_ADDR);
-    nRF24_ReadMBReg(nrf, TX_ADDR_REG, buf, SIZE_TX_ADDR);
+    nRF24_SetTXAddr(nrf, (uint8_t *) TEST_TX_ADDR, SIZE_TX_ADDR);
+    nRF24_GetTXAddr(nrf, buf, SIZE_TX_ADDR);
 
     for(uint8_t i = 0; i < SIZE_TX_ADDR; i++) {
         if(buf[i] != TEST_TX_ADDR[i]) {
@@ -108,18 +158,6 @@ uint8_t nRF24_Test(nrf24_t *nrf) {
     }
 
     return status;
-}
-
-void nRF24_FlushTx(nrf24_t *nrf) {
-    uint8_t status = 0;
-    
-    nRF24_WriteReg(nrf, CMD_FLUSH_TX, status);
-}
-
-void nRF24_FlushRx(nrf24_t *nrf) {
-    uint8_t status = 0;
-
-    nRF24_WriteReg(nrf, CMD_FLUSH_RX, status);
 }
 
 uint8_t nRF24_GetConfig(nrf24_t *nrf) {
@@ -218,7 +256,7 @@ uint8_t nRF24_GetRXPipeWidth(nrf24_t *nrf, pipe_t pipe) {
             addr = RX_PW_P5_REG;
             break;
         default:
-            return;
+            return 0;
     }
 
     return nRF24_ReadReg(nrf, addr);
@@ -356,4 +394,27 @@ void nRF24_SetFeatureConfig(nrf24_t *nrf, uint8_t value){
     value &= MASK_FEATURE;
 
     nRF24_WriteReg(nrf, FEATURE_REG, value);
+}
+
+void nRF24_SetOperationalMode(nrf24_t *nrf, mode_t mode) {
+    nRF24_SetConfig(nrf, mode);
+}
+
+void nRF24_FlushTx(nrf24_t *nrf) {
+    uint8_t status = 0;
+    
+    nRF24_WriteReg(nrf, CMD_FLUSH_TX, status);
+}
+
+void nRF24_FlushRx(nrf24_t *nrf) {
+    uint8_t status = 0;
+
+    nRF24_WriteReg(nrf, CMD_FLUSH_RX, status);
+}
+
+void nRF24_ClearFifoStatus(nrf24_t *nrf) {
+    uint8_t val = nRF24_ReadReg(nrf, FIFO_STATUS_REG);
+
+    val &= MASK_FIFO_STATUS;
+    nRF24_WriteReg(nrf, FIFO_STATUS_REG, val);
 }
