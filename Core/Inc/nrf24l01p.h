@@ -3,6 +3,16 @@
 
 #include "stm32f4xx_hal.h"
 
+// Transceiver modes
+#define MODE_TX       ((uint8_t) 0)
+#define MODE_RX       ((uint8_t) 1)
+#define MODE_STANDBY  ((uint8_t) 2)
+
+// States
+#define STATE_OFF 0
+#define STATE_ON 1
+
+// Commands
 #define CMD_R_REGISTER          0x00 // Read command/status regs
 #define CMD_W_REGISTER          0x20 // Write command/status regs
 #define CMD_R_RX_PAYLOAD        0x61 // Read rx payload
@@ -15,6 +25,7 @@
 #define CMD_W_TX_PAYLOAD_NO_ACK 0xB0 // Disable autoack for specific packet (tx mode)
 #define CMD_NOP                 0xFF // NOP
 
+// Registers
 #define CONFIG_REG      0x00 // Configuration
 #define EN_AA_REG       0x01 // Enable auto ack
 #define EN_RXADDR_REG   0x02 // Enabled rx addrs
@@ -212,14 +223,9 @@ typedef enum pipe {
     p2 = 2,
     p3 = 3,
     p4 = 4,
-    p5 = 5
+    p5 = 5,
+    pAll = 6
 } pipe_t;
-
-typedef enum mode {
-    mode_tx = 0x2,
-    mode_rx = 0x3,
-    mode_powerdown = 0x0
-} mode_t;
 
 uint8_t nRF24_Init(nrf24_t *nrf, SPI_HandleTypeDef *hspi, GPIO_TypeDef *csnPort, uint16_t csnPin, GPIO_TypeDef *cePort, uint16_t cePin);
 uint8_t nRF24_Test(nrf24_t *nrf);

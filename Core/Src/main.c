@@ -222,6 +222,28 @@ int main(void)
   #ifdef DUMPREGS
     dumpRegs(&nrf);
   #endif
+
+  // Disable shockburst
+
+  // Set RF channel
+
+  // Set data rate
+
+  // CRC format
+
+  // Addr width
+
+  // Set tx addr
+
+  // Set pipe addr
+
+  // Set tx power
+
+  // Set operational mode
+
+  // Clear IRQ
+
+  // Power up
   
   /* USER CODE END 2 */
 

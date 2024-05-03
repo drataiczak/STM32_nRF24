@@ -99,7 +99,12 @@ void nRF24_WriteReg(nrf24_t *nrf, uint8_t reg, uint8_t value) {
 
     _CSN_L(nrf);
     _RW(nrf, address);
-    _RW(nrf, value);
+
+    // The write is a command, not a reg write
+    if(reg != CMD_FLUSH_RX && reg != CMD_FLUSH_TX) {
+        _RW(nrf, value);
+    }
+    
     _CSN_H(nrf);
 }
 
@@ -396,10 +401,6 @@ void nRF24_SetFeatureConfig(nrf24_t *nrf, uint8_t value){
     nRF24_WriteReg(nrf, FEATURE_REG, value);
 }
 
-void nRF24_SetOperationalMode(nrf24_t *nrf, mode_t mode) {
-    nRF24_SetConfig(nrf, mode);
-}
-
 void nRF24_FlushTx(nrf24_t *nrf) {
     uint8_t status = 0;
     
@@ -417,4 +418,43 @@ void nRF24_ClearFifoStatus(nrf24_t *nrf) {
 
     val &= MASK_FIFO_STATUS;
     nRF24_WriteReg(nrf, FIFO_STATUS_REG, val);
+}
+
+void nRF24_SetOperationalMode(nrf24_t *nrf, uint8_t mode) {
+    //          (PWR | PRIM | CE)
+    // Rx mode =   1 |  1   | 1
+    // Tx mode =   1 |  0   | 1
+    // Standby 2 = 1 |  0   | 1
+    // Standby 1 = 1 |  X   | 0
+    uint8_t regValue;
+    uint8_t primBit = (1 << PRIM_RX_B) & mode;
+
+    // Default to standby if mode is not as expected
+    if(mode > MODE_STANDBY) {
+        primBit = 0;
+    }
+
+    // If in standby, drop CE low. Otherwise set it high.
+    mode == MODE_STANDBY ? _CE_L(nrf) : _CE_H(nrf);
+
+    regValue = nRF24_GetConfig(nrf);
+    nRF24_SetConfig(nrf, regValue | primBit); // TODO This isn't correct, won't unset bit
+}
+
+void nRF24_SetPipeAA(nrf24_t *nrf, pipe_t pipe, uint8_t state) {
+    uint8_t regValue;
+    
+    if(pipe >= pAll) {
+        if(state == STATE_ON) {
+            nRF24_SetAutoAck(nrf, MASK_AUTOACK);
+        }
+        else {
+            nRF24_SetAutoAck(nrf, 0x00);
+        }
+    }
+    else {
+        regValue = nRF24_GetAutoAck(nrf);
+        nRF24_SetAutoAck(nrf, regValue & (1 << pipe) & state); // TODO This isn't correct
+    }
+    pipe >= pAll ? 0 : (1 << pipe);
 }
