@@ -24,6 +24,20 @@ uint8_t _RW(nrf24_t *nrf, uint8_t reg) {
     return value;
 }
 
+uint8_t _SET_BIT(uint8_t value, uint8_t bit, uint8_t bitValue) {
+    // Bail if bitValue isnt 1/0
+    if(bitValue != STATE_OFF && bitValue != STATE_ON) {
+        return value;
+    }
+
+    // Dont modify passed in values
+    uint8_t newValue = value;
+
+    newValue = (newValue & ~(1 << bit)) | (bitValue & (1 << bit));
+
+    return newValue;
+}
+
 uint8_t nRF24_Init(nrf24_t *nrf, SPI_HandleTypeDef *hspi, GPIO_TypeDef *csnPort, uint16_t csnPin, GPIO_TypeDef *cePort, uint16_t cePin) {
     uint8_t status = 0;
     uint8_t buf[5] = {0};
@@ -94,6 +108,15 @@ uint8_t nRF24_Init(nrf24_t *nrf, SPI_HandleTypeDef *hspi, GPIO_TypeDef *csnPort,
     return status;
 }
 
+/*
+params:
+    in: nrf24_t * - Handle to nrf object
+    in: uint8_t - Register to write to
+    in: uint8_t - Byte to write to register
+
+desc:
+    Issues a single byte write command to the specified register with the specified value
+*/
 void nRF24_WriteReg(nrf24_t *nrf, uint8_t reg, uint8_t value) {
     uint8_t address = reg | CMD_W_REGISTER;
 
@@ -108,6 +131,17 @@ void nRF24_WriteReg(nrf24_t *nrf, uint8_t reg, uint8_t value) {
     _CSN_H(nrf);
 }
 
+/*
+params:
+    in: nrf24_t * - Handle to nrf object
+    in: uint8_t - Register to read from
+
+returns:
+    uint8_t: The byte read from the provided register
+
+desc:
+    Reads the specified register and returns it's contents.
+*/
 uint8_t nRF24_ReadReg(nrf24_t *nrf, uint8_t reg) {
     uint8_t addr = reg | CMD_R_REGISTER;
     uint8_t value;
@@ -120,6 +154,16 @@ uint8_t nRF24_ReadReg(nrf24_t *nrf, uint8_t reg) {
     return value;
 }
 
+/*
+params:
+    in: nrf24_t * - Handle to nrf object
+    in: uint8_t - Register to write to
+    in: uint8_t * - Buffer of bytes to write to register
+    in: size_t - Number of bytes to write from buffer
+
+desc:
+    Issues a multibyte write command to the specified register with the specified values
+*/
 void nRF24_WriteMBReg(nrf24_t *nrf, uint8_t reg, uint8_t *buf, size_t size) {
     uint8_t addr = reg | CMD_W_REGISTER;
 
@@ -133,6 +177,16 @@ void nRF24_WriteMBReg(nrf24_t *nrf, uint8_t reg, uint8_t *buf, size_t size) {
     _CSN_H(nrf);
 }
 
+/* 
+params:
+    in: nrf24_t * - Handle to nrf object
+    in: uint8_t - Register to read from
+    out: uint8_t * - Buffer to place read data into
+    in: size_t - Size of the buffer to write into
+
+desc:
+    Reads specified number of bytes from the given register and writes them to the provided buffer.
+*/
 void nRF24_ReadMBReg(nrf24_t *nrf, uint8_t reg, uint8_t *buf, size_t size) {
     uint8_t addr = reg | CMD_R_REGISTER;
 
@@ -401,18 +455,39 @@ void nRF24_SetFeatureConfig(nrf24_t *nrf, uint8_t value){
     nRF24_WriteReg(nrf, FEATURE_REG, value);
 }
 
+/*
+params:
+    in: nrf24_t * - Handle to nrf object
+
+desc:
+    Sends command to transceiver to flush the Tx FIFO.
+*/
 void nRF24_FlushTx(nrf24_t *nrf) {
     uint8_t status = 0;
     
     nRF24_WriteReg(nrf, CMD_FLUSH_TX, status);
 }
 
+/*
+params:
+    in: nrf24_t * - Handle to nrf object
+
+desc:
+    Sends command to transceiver to flush the Rx FIFO.
+*/
 void nRF24_FlushRx(nrf24_t *nrf) {
     uint8_t status = 0;
 
     nRF24_WriteReg(nrf, CMD_FLUSH_RX, status);
 }
 
+/*
+params:
+    in: nrf24_t * - Handle to nrf object
+
+desc:
+    Clears the FIFO status register bits
+*/
 void nRF24_ClearFifoStatus(nrf24_t *nrf) {
     uint8_t val = nRF24_ReadReg(nrf, FIFO_STATUS_REG);
 
@@ -420,6 +495,14 @@ void nRF24_ClearFifoStatus(nrf24_t *nrf) {
     nRF24_WriteReg(nrf, FIFO_STATUS_REG, val);
 }
 
+/*
+params:
+    in: nrf24_t * - Handle to nrf object
+    in: uint8_t - MODE_TX or MODE_RX to set transceiver to
+
+desc:
+    Sets transceiver into either Rx or Tx mode.
+*/
 void nRF24_SetOperationalMode(nrf24_t *nrf, uint8_t mode) {
     //          (PWR | PRIM | CE)
     // Rx mode =   1 |  1   | 1
@@ -427,22 +510,35 @@ void nRF24_SetOperationalMode(nrf24_t *nrf, uint8_t mode) {
     // Standby 2 = 1 |  0   | 1
     // Standby 1 = 1 |  X   | 0
     uint8_t regValue;
-    uint8_t primBit = (1 << PRIM_RX_B) & mode;
 
-    // Default to standby if mode is not as expected
-    if(mode > MODE_STANDBY) {
-        primBit = 0;
+    // Don't allow for any non-defined modes
+    if(mode != MODE_TX && mode != MODE_RX) {
+        return;
     }
 
-    // If in standby, drop CE low. Otherwise set it high.
-    mode == MODE_STANDBY ? _CE_L(nrf) : _CE_H(nrf);
+    _CE_H(nrf);
 
     regValue = nRF24_GetConfig(nrf);
-    nRF24_SetConfig(nrf, regValue | primBit); // TODO This isn't correct, won't unset bit
+    regValue = _SET_BIT(regValue, PRIM_RX_B, mode);
+    nRF24_SetConfig(nrf, regValue);
 }
 
+/*
+params:
+    in: nrf24_t * - Handle to nrf object
+    in: pipe_t - Pipe to operate on (or pAll for all pipes)
+    in: uint8_t - STATE_ON or STATE_OFF
+
+desc:
+    Sets the auto acknowledge value for one or all pipes to a specified state.
+*/
 void nRF24_SetPipeAA(nrf24_t *nrf, pipe_t pipe, uint8_t state) {
     uint8_t regValue;
+
+    // No weird states
+    if(state != STATE_OFF && state != STATE_ON) {
+        return;
+    }
     
     if(pipe >= pAll) {
         if(state == STATE_ON) {
@@ -454,7 +550,7 @@ void nRF24_SetPipeAA(nrf24_t *nrf, pipe_t pipe, uint8_t state) {
     }
     else {
         regValue = nRF24_GetAutoAck(nrf);
-        nRF24_SetAutoAck(nrf, regValue & (1 << pipe) & state); // TODO This isn't correct
+        regValue = _SET_BIT(regValue, pipe, state);
+        nRF24_SetAutoAck(nrf, regValue);
     }
-    pipe >= pAll ? 0 : (1 << pipe);
 }

@@ -6,7 +6,6 @@
 // Transceiver modes
 #define MODE_TX       ((uint8_t) 0)
 #define MODE_RX       ((uint8_t) 1)
-#define MODE_STANDBY  ((uint8_t) 2)
 
 // States
 #define STATE_OFF 0
@@ -271,6 +270,7 @@ void nRF24_SetFeatureConfig(nrf24_t *nrf, uint8_t value);
 void nRF24_ClearFifoStatus(nrf24_t *nrf);
 
 // General
-void nRF24_SetOperationalMode(nrf24_t *nrf, mode_t mode);
+void nRF24_SetOperationalMode(nrf24_t *nrf, uint8_t mode);
+void nRF24_SetPipeAA(nrf24_t *nrf, pipe_t pipe, uint8_t state);
 
 #endif

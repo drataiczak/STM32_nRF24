@@ -224,6 +224,7 @@ int main(void)
   #endif
 
   // Disable shockburst
+  nRF24_SetPipeAA(&nrf, pAll, STATE_OFF);
 
   // Set RF channel
 
