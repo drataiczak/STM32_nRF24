@@ -134,7 +134,7 @@
 #define MASK_ENABLERX_ADDR 0x3F
 #define MASK_ADDR_WIDTH    0x03
 #define MASK_RF_CH         0x7F
-#define MASK_RF_CONFIG     0xBE
+#define MASK_RF_SETUP      0xBE
 #define MASK_STATUS        0x7F
 #define MASK_RX_PW_PIPE    0x3F
 #define MASK_FIFO_STATUS   0xF3
@@ -150,7 +150,7 @@
 #define DEF_ADDR_WIDTH 0x03
 #define DEF_AUTO_RETR 0x03
 #define DEF_RF_CHANNEL 0x02
-#define DEF_RF_CONFIG 0x0E
+#define DEF_RF_SETUP 0x0E
 #define DEF_STATUS 0x00
 #define DEF_RX_P0_ADDR 0xE7E7E7E7E7
 #define DEF_RX_P1_ADDR 0XC2C2C2C2C2

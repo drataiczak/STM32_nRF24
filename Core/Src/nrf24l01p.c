@@ -62,7 +62,7 @@ uint8_t nRF24_Init(nrf24_t *nrf, SPI_HandleTypeDef *hspi, GPIO_TypeDef *csnPort,
     nRF24_SetAddrWidth(nrf, DEF_ADDR_WIDTH);
     nRF24_SetAutoRetransmit(nrf, DEF_AUTO_RETR);
     nRF24_SetRFChannel(nrf, DEF_RF_CHANNEL);
-    nRF24_SetRFConfig(nrf, DEF_RF_CONFIG); // Last bit is "don't care"
+    nRF24_SetRFConfig(nrf, DEF_RF_SETUP); // Last bit is "don't care"
     nRF24_SetStatus(nrf, DEF_STATUS);
 
     // TODO: Figure out better way to do this
@@ -368,7 +368,7 @@ void nRF24_SetRFChannel(nrf24_t *nrf, uint8_t value) {
 }
 
 void nRF24_SetRFConfig(nrf24_t *nrf, uint8_t value) {
-    value &= MASK_RF_CONFIG;
+    value &= MASK_RF_SETUP;
 
     nRF24_WriteReg(nrf, RF_SETUP_REG, value);
 }

@@ -31,6 +31,7 @@
 #endif
 
 #define PROD_TX_ADDR "TXADR"
+#define PROD_RF_CHAN 0xF1
 
 _PUTCHAR {
   HAL_UART_Transmit(&huart2, (uint8_t *) &ch, 1, HAL_MAX_DELAY);
@@ -238,7 +239,7 @@ int main(void)
   nRF24_SetPipeAA(&nrf, pAll, STATE_OFF);
 
   // Set RF channel
-  nRF24_SetRFChannel(&nrf, 0xF1);
+  nRF24_SetRFChannel(&nrf, PROD_RF_CHAN);
 
   // Set data rate
   nRF24_SetRFDataRate(&nrf, kbps250);
