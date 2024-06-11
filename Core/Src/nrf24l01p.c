@@ -373,6 +373,24 @@ void nRF24_SetRFConfig(nrf24_t *nrf, uint8_t value) {
     nRF24_WriteReg(nrf, RF_SETUP_REG, value);
 }
 
+void nRF24_SetCRC(nrf24_t *nrf, crc_t value) {
+    uint8_t regValue = nRF24_GetConfig(nrf);
+
+    regValue &= ~MASK_CRC;
+    regValue |= value & MASK_CRC;
+
+    nRF24_SetConfig(nrf, regValue);
+}
+
+void nRF24_SetRFDataRate(nrf24_t *nrf, rfDataRate_t rate) {
+    uint8_t regValue = nRF24_GetRFConfig(nrf);
+
+    _SET_BIT(regValue, RF_DR_LOW_B, rate & 0x01);
+    _SET_BIT(regValue, RF_DR_HIGH_B, rate & 0x02);
+
+    nRF24_SetRFConfig(nrf, regValue);
+}
+
 void nRF24_SetStatus(nrf24_t *nrf, uint8_t value) {
     value &= MASK_STATUS;
 
@@ -553,4 +571,30 @@ void nRF24_SetPipeAA(nrf24_t *nrf, pipe_t pipe, uint8_t state) {
         regValue = _SET_BIT(regValue, pipe, state);
         nRF24_SetAutoAck(nrf, regValue);
     }
+}
+
+void nRF24_SetPower(nrf24_t *nrf, rfPwr_t value) {
+    uint8_t regValue = nRF24_GetRFConfig(nrf);
+
+    _SET_BIT(regValue, RF_PWR_HIGH_B, value & 0x02);
+    _SET_BIT(regValue, RF_PWR_LOW_B, value & 0x1);
+
+    nRF24_SetRFConfig(nrf, regValue);
+}
+
+void nRF24_SetPowerState(nrf24_t *nrf, uint8_t state) {
+    uint8_t regValue = nRF24_GetConfig(nrf);
+
+    _SET_BIT(regValue, PWR_UP_B, state);
+
+    nRF24_SetConfig(nrf, regValue);
+}
+
+void nRF24_ClearIRQ(nrf24_t *nrf) {
+    uint8_t regValue = nRF24_GetStatus(nrf);
+
+    // Need to clear RX_DR, TX_DS, and MAX_RT to reset interrupts
+    regValue &= ~MASK_IRQ;
+
+    nRF24_SetStatus(nrf, regValue);
 }

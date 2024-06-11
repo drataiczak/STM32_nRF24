@@ -30,6 +30,8 @@
   #define _PUTCHAR int fputc(int ch, FILE *f)
 #endif
 
+#define PROD_TX_ADDR "TXADR"
+
 _PUTCHAR {
   HAL_UART_Transmit(&huart2, (uint8_t *) &ch, 1, HAL_MAX_DELAY);
   return 1;
@@ -70,6 +72,13 @@ void dumpRegs(nrf24_t *nrf);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+/*
+params:
+  in: nrf24_t * - Handle of nrf object
+
+desc:
+  Dumps all registers of the transceiver to USART device configured in _PUTCHAR macro
+*/
 void dumpRegs(nrf24_t *nrf) {
   uint8_t buf[5] = {0};
   uint8_t reg;
@@ -217,8 +226,10 @@ int main(void)
 
   nrf24_t nrf;
   uint8_t status = 0;
+  uint8_t regValue = 0;
   status = nRF24_Init(&nrf, &hspi1, CSN_GPIO_Port, CSN_Pin, CE_GPIO_Port, CE_Pin);
 
+  // Configured at compile time using -DDUMPREGS with gcc/clang
   #ifdef DUMPREGS
     dumpRegs(&nrf);
   #endif
@@ -227,24 +238,36 @@ int main(void)
   nRF24_SetPipeAA(&nrf, pAll, STATE_OFF);
 
   // Set RF channel
+  nRF24_SetRFChannel(&nrf, 0xF1);
 
   // Set data rate
+  nRF24_SetRFDataRate(&nrf, kbps250);
 
   // CRC format
+  nRF24_SetCRC(&nrf, crc_2byte);
 
   // Addr width
+  nRF24_SetAddrWidth(&nrf, aw5);
 
   // Set tx addr
-
-  // Set pipe addr
+  nRF24_SetTXAddr(&nrf, (uint8_t *) PROD_TX_ADDR, SIZE_TX_ADDR);
 
   // Set tx power
+  nRF24_SetPower(&nrf, rf0dbm);
 
   // Set operational mode
+  nRF24_SetOperationalMode(&nrf, MODE_TX);
 
   // Clear IRQ
+  nRF24_ClearIRQ(&nrf);
 
   // Power up
+  nRF24_SetPowerState(&nrf, STATE_ON);
+
+  #ifdef DUMPREGS
+    printf("Configuration complete, dumping registers\r\n");
+    dumpRegs(&nrf);
+  #endif
   
   /* USER CODE END 2 */
 

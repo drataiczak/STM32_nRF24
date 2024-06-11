@@ -82,11 +82,12 @@
 #define ARC_B 0
 
 // RF_SETUP_REG bits
-#define CONT_WAVE_B  7
-#define RF_DR_LOW_B  5
-#define PLL_LOCK_B   4
-#define RF_DR_HIGH_B 3
-#define RF_PWR_B     1
+#define CONT_WAVE_B     7
+#define RF_DR_LOW_B     5
+#define PLL_LOCK_B      4
+#define RF_DR_HIGH_B    3
+#define RF_PWR_HIGH_B   2
+#define RF_PWR_LOW_B    1
 
 //  STATUS_REG bits
 #define RX_DR_B  6
@@ -139,6 +140,8 @@
 #define MASK_FIFO_STATUS   0xF3
 #define MASK_DYNPD         0x3F
 #define MASK_FEATURE       0x03
+#define MASK_CRC           0x0C
+#define MASK_IRQ           0x70
 
 // Default reg values
 #define DEF_CONFIG 0x08
@@ -212,8 +215,8 @@ typedef enum rfPwr {
 
 typedef enum rfDataRate {
     mbps1 =   0x00, // 1Mbps
-    mbps2 =   0x01, // 2Mbps
-    kbps250 = 0x02  // 250Kbps
+    mbps2 =   0x02, // 2Mbps
+    kbps250 = 0x01  // 250Kbps
 } rfDataRate_t;
 
 typedef enum pipe {
@@ -225,6 +228,12 @@ typedef enum pipe {
     p5 = 5,
     pAll = 6
 } pipe_t;
+
+typedef enum crc {
+    crc_off = 0,
+    crc_1byte = 0x08,
+    crc_2byte = 0x0C
+} crc_t;
 
 uint8_t nRF24_Init(nrf24_t *nrf, SPI_HandleTypeDef *hspi, GPIO_TypeDef *csnPort, uint16_t csnPin, GPIO_TypeDef *cePort, uint16_t cePin);
 uint8_t nRF24_Test(nrf24_t *nrf);
@@ -260,7 +269,9 @@ void nRF24_SetEnabledRxAddrs(nrf24_t *nrf, uint8_t value);
 void nRF24_SetAddrWidth(nrf24_t *nrf, uint8_t value);
 void nRF24_SetAutoRetransmit(nrf24_t *nrf, uint8_t value);
 void nRF24_SetRFChannel(nrf24_t *nrf, uint8_t value);
-void nRF24_SetRFConfig(nrf24_t *nrf, uint8_t val);
+void nRF24_SetRFConfig(nrf24_t *nrf, uint8_t value);
+void nRF24_SetCRC(nrf24_t *nrf, crc_t value);
+void nRF24_SetRFDataRate(nrf24_t *nrf, rfDataRate_t rate);
 void nRF24_SetStatus(nrf24_t *nrf, uint8_t value);
 void nRF24_SetRXPipeAddr(nrf24_t *nrf, pipe_t pipe, uint8_t *buf, size_t size);
 void nRF24_SetTXAddr(nrf24_t *nrf, uint8_t *buf, size_t size);
@@ -268,6 +279,9 @@ void nRF24_SetRXPipeWidth(nrf24_t *nrf, pipe_t pipe, uint8_t value);
 void nRF24_SetDynamicPayloadConfig(nrf24_t *nrf, uint8_t value);
 void nRF24_SetFeatureConfig(nrf24_t *nrf, uint8_t value);
 void nRF24_ClearFifoStatus(nrf24_t *nrf);
+void nRF24_SetPower(nrf24_t *nrf, rfPwr_t value);
+void nRF24_SetPowerState(nrf24_t *nrf, uint8_t state);
+void nRF24_ClearIRQ(nrf24_t *nrf);
 
 // General
 void nRF24_SetOperationalMode(nrf24_t *nrf, uint8_t mode);
